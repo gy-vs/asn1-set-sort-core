@@ -1,1 +1,89 @@
-export type Tlv={tag:number;length:number;value:Uint8Array};export function decodeTlv(data:Uint8Array):Tlv{if(data.length<2)throw new Error('truncated');const tag=data[0],length=data[1];if(length&128)throw new Error('long length unsupported');if(data.length<2+length)throw new Error('truncated');return{tag,length,value:data.slice(2,2+length)}}export function decodeInteger(bytes:Uint8Array){let value=0n;for(const byte of bytes)value=(value<<8n)|BigInt(byte);return value}
+/**
+ * Minimal, dependency-free DER (X.690) encoder/decoder.
+ *
+ * Build a schema with the type factories (`sequence`, `setOf`, `choice`, ...),
+ * optionally annotate fields with `.optional()`, `.default()`, `.implicit(n)`,
+ * `.explicit(n)`, then `encode(schema, value)` / `decode(schema, bytes)`.
+ */
+export {
+  // top-level driver
+  encode,
+  decode,
+  // value types
+  BitString,
+  Choice,
+  // schema node types (for instanceof and modifier chaining)
+  AsnType,
+  OptionalType,
+  DefaultType,
+  ImplicitType,
+  ExplicitType,
+  CollectionOfType,
+  SequenceOrSetType,
+  ChoiceType,
+  LazyType,
+  // options
+  type EncodeOptions,
+  type DecodeOptions,
+  type FieldDef,
+  // error type
+  DERError,
+} from './schema.js';
+
+export { DERError as DERDecodeError } from './errors.js';
+
+import {
+  boolean,
+  integer,
+  bitString,
+  octetString,
+  nullType,
+  objectIdentifier,
+  utf8String,
+  sequenceOf,
+  setOf,
+  sequence,
+  set,
+  choice,
+  lazy,
+} from './schema.js';
+
+/**
+ * Primitive/constructed type factories and singletons.
+ *
+ * ```ts
+ * import { asn1 } from './index.js';
+ * const schema = asn1.sequence([['id', asn1.integer], ['name', asn1.utf8String.optional()]]);
+ * ```
+ */
+export const asn1 = {
+  boolean,
+  integer,
+  bitString,
+  octetString,
+  null: nullType,
+  objectIdentifier,
+  utf8String,
+  sequenceOf,
+  setOf,
+  sequence,
+  set,
+  choice,
+  lazy,
+};
+
+export {
+  boolean,
+  integer,
+  bitString,
+  octetString,
+  nullType,
+  objectIdentifier,
+  utf8String,
+  sequenceOf,
+  setOf,
+  sequence,
+  set,
+  choice,
+  lazy,
+};
